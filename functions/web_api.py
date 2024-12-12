@@ -104,22 +104,19 @@ def scrape_pdf(url):
             page = reader.pages[page_num]
             extracted_texts.append(page.extract_text())
     extracted_text = " ".join(extracted_texts)
-    return extracted_text # string
+    return extracted_text
 
 def extract_unique_urls(input_string):
-    # Define regex patterns to match different types of URLs
     regex_patterns = [
         r'(https?://\S+)',   # Matches HTTP and HTTPS URLs
         r'(www\.\S+\.\w+)',  # Matches URLs starting with www
         r'(ftp://\S+)',      # Matches FTP URLs
-        # Add more regex patterns if needed for other URL formats
     ]
     
     extracted_urls = []
     
     # Iterate through each regex pattern
     for pattern in regex_patterns:
-        # Find all matches for the pattern in the input string
         matches = re.findall(pattern, input_string)
         # Add the matches to the list of extracted URLs
         extracted_urls.extend(matches)
@@ -137,7 +134,6 @@ def web_search(query,relevanceSort=False):
     if unique_urls :
         extracted_content = extract_links(list(unique_urls))
         print("Extracting content from URLs")
-        # print(extracted_content)
     bi_encoder_searched_passages=""
     urls = []
     passages = []
@@ -151,18 +147,14 @@ def web_search(query,relevanceSort=False):
     passages=[]
     time_for_scraping = time.time()
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        # Submitting tasks and collecting futures
         futures = {executor.submit(scraper, url, con, DataWrtUrls, passages): url for url in urls}
         
-        # Processing the results as tasks complete
         for future in concurrent.futures.as_completed(futures):
             url = futures[future]
             try:
                 result = future.result()
-                # Process result here, e.g., logging or saving the scraped data
             except Exception as exc:
                 print(f'URL {url} generated an exception: {exc}')
-    #print("Passages=",passages)
     print("time for scraping: ",time.time()-time_for_scraping)
     passages2 = []
     i = 0
@@ -191,9 +183,7 @@ def web_search(query,relevanceSort=False):
         bi_encoder_searched_passages = BM25func(passages2,customer_message)
     else:
         bi_encoder_searched_passages = passages2
-    # if not prod: print(bi_encoder_searched_passages)
     end = time.time()
-    # print(f"Runtime of the program is {end - start}")
     lfqa_time = time.time()
     question = customer_message
     
@@ -204,26 +194,11 @@ def web_search(query,relevanceSort=False):
         supporting_texts = ""
         for i in range(len(bi_encoder_searched_passages)):
             supporting_texts += "Supporting Text "+str(i+1)+": "+str(bi_encoder_searched_passages[i])+"\n"
-    # print(supporting_texts)
-    # UrlWrtRank = {}
-    # k = 0
-    # for i in range(len(bi_encoder_searched_passages)):
-    #     for url, value in DataWrtUrls.items():
-    #         string = str(value)
-    #         if k == 7:
-    #             break
-    #         if string.find(str(bi_encoder_searched_passages[i]))!=-1:
-    #             UrlWrtRank[k]=url
-    #             k += 1
-    #         if string.find(str(bi_encoder_searched_passages[i]))==-1:
-    #             UrlWrtRank[k]=url
-    #             k += 1
     completion = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "system", "content": "You are a helpful Research Assistant. Your job is to provide your boss with the most relevannt information in a report format. If present, format code snippets within ''' ''' triple quotes."},
     {"role": "user", "content": "Generate answer to the question: "+str(question)+"\n\nSupporting Texts\n"+str(supporting_texts)}])
     output=completion.choices[0].message.content
-    # print(output)
     return output
             
             
