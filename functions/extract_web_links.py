@@ -21,7 +21,7 @@ def extract_links(URLs):
                 extracted_content.append(content.text)
         except:
             pass
-    return extracted_content # list of strings
+    return extracted_content # strings' list
 
 def scrape_pdf(url):
     session = requests.Session()

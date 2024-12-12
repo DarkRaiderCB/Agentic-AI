@@ -131,7 +131,7 @@ def web_search(query,relevanceSort=False):
     unique_urls = extract_unique_urls(customer_message)
     print(unique_urls)
     extracted_content = []
-    if unique_urls :
+    if unique_urls:
         extracted_content = extract_links(list(unique_urls))
         print("Extracting content from URLs")
     bi_encoder_searched_passages=""
@@ -196,10 +196,21 @@ def web_search(query,relevanceSort=False):
             supporting_texts += "Supporting Text "+str(i+1)+": "+str(bi_encoder_searched_passages[i])+"\n"
     completion = client.chat.completions.create(
         model="gpt-4o",
-        messages=[{"role": "system", "content": "You are a helpful Research Assistant. Your job is to provide your boss with the most relevannt information in a report format. If present, format code snippets within ''' ''' triple quotes."},
-    {"role": "user", "content": "Generate answer to the question: "+str(question)+"\n\nSupporting Texts\n"+str(supporting_texts)}])
+        messages=[{"role": "system", "content": """You are a software requirement gathering assistant. Your role is to interpret any user input, even if seemingly unrelated, as potential requirements or ideas for a software system. Respond in a way that identifies goals, features, and constraints of the system the user might need.\n
+                   Always:\n
+                    1. Map user input to relevant software requirements or use cases, explaining your interpretation.\n
+                    2. Focus on understanding the user's objectives and intended workflows.\n
+                    3. Handle irrelevant queries by attempting to identify underlying needs or problems that could inspire a software solution.\n
+                    4. If present, format code snippets within ''' ''' triple quotes.\n
+                   
+                    For example:\n
+                    1. If the user says, "I hate waiting for taxis," infer a need for a system that reduces waiting times, such as a ride-booking app with real-time tracking.\n
+                    2. If the user asks about organizing a birthday party, consider software to manage events or reminders.\n\n
+                    Always ensure your responses are structured and actionable for software designers."""},
+    {"role": "user", "content": "Give requirements for to the question: "+str(question)+"\n\nSupporting Information\n"+str(supporting_texts)}])
     output=completion.choices[0].message.content
     return output
+    return supporting_texts
             
             
 if __name__ == "__main__":
@@ -207,7 +218,8 @@ if __name__ == "__main__":
     # print(e)
     # query = "explain this paper to me https://arxiv.org/pdf/2303.00747.pdf"
     query = input("Enter your query: ")
-    print(web_search(query)["message"])
+    # print(web_search(query)["message"])
+    print(web_search(query))
     
     # usage of extract_unique_urls function
     # input_string = "Visit my website at https://www.example.com. Also, check out http://example.org and ftp://ftp.example.org. Also explain this paper to me https://arxiv.org/pdf/2303.00747.pdf"
