@@ -9,7 +9,6 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import fastapi
 from decouple import config
-from gridfs import GridFS
 from PIL import Image
 import io
 import mimetypes
@@ -95,29 +94,6 @@ def convert_bytes_to_original_format(file_bytes, mime_type, save_path):
     else:
         # Handle other types or raise an exception for unknown types
         raise ValueError(f"Unsupported MIME type: {mime_type}")
-
-
-
-def store_file_in_mongodb(file_path, collection_name):
-    fs = GridFS(db, collection=collection_name)
-    with open(file_path, 'rb') as file:
-        # Determine file type using mimetypes
-        mime_type, _ = mimetypes.guess_type(file_path)
-        metadata = {'mime_type': mime_type}
-
-        file_id = fs.put(file, filename=os.path.basename(file_path), metadata=metadata)
-
-    return file_id
-
-def retrieve_file_from_mongodb(file_id, collection_name):
-    fs = GridFS(db, collection=collection_name)
-    file_data = fs.get(file_id)
-
-    # Retrieve metadata
-    metadata = file_data.metadata
-    mime_type = metadata.get('mime_type', 'application/octet-stream')
-
-    return file_data.read(), mime_type
 
 
 def get_folder_structure(dir_path,parent=""):
