@@ -20,7 +20,6 @@ from utils.parse_function import extract_function_names, extract_function_parame
 from functions.coder import *
 from functions.req_agent import *
 from functions.call_function import function_dict
-from functions.extract_web_links import extract_links, scrape_pdf
 import copy
 import traceback
 
