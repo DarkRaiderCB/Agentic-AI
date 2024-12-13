@@ -8,7 +8,6 @@ import numpy as np
 import concurrent.futures
 import time
 import requests
-# from extract_web_links import scrape_pdf, extract_links
 import PyPDF2
 import os
 import re
@@ -207,20 +206,21 @@ def web_search(query,relevanceSort=False):
                     1. If the user says, "I hate waiting for taxis," infer a need for a system that reduces waiting times, such as a ride-booking app with real-time tracking.\n
                     2. If the user asks about organizing a birthday party, consider software to manage events or reminders.\n\n
                     Always ensure your responses are structured and actionable for software designers."""},
-    {"role": "user", "content": "Give requirements for to the question: "+str(question)+"\n\nSupporting Information\n"+str(supporting_texts)}])
+                  {"role": "user", "content": f"""Question: {str(question)}\n
+                    Supporting Information:
+                    {str(supporting_texts)}\n
+                    Based on the above, identify actionable software requirements. If the input is unclear, hypothesize potential software needs."""}])
     output=completion.choices[0].message.content
     return output
-    return supporting_texts
             
             
 if __name__ == "__main__":
+    pass
     # e = extract_web_links("https://arxiv.org/pdf/2303.00747.pdf")
     # print(e)
     # query = "explain this paper to me https://arxiv.org/pdf/2303.00747.pdf"
-    query = input("Enter your query: ")
-    # print(web_search(query)["message"])
-    print(web_search(query))
-    
+    # query = input("Enter your query: ")
+    # print(web_search(query)["message"])    
     # usage of extract_unique_urls function
     # input_string = "Visit my website at https://www.example.com. Also, check out http://example.org and ftp://ftp.example.org. Also explain this paper to me https://arxiv.org/pdf/2303.00747.pdf"
     # unique_urls = extract_unique_urls(input_string)
