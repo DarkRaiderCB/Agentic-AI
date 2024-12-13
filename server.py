@@ -18,7 +18,7 @@ from utils.process import *
 from utils.fileparse import *
 from utils.parse_function import extract_function_names, extract_function_parameters, extract_iter
 from functions.coder import *
-from functions.web_api import *
+from functions.req_agent import *
 from functions.call_function import function_dict
 from functions.extract_web_links import extract_links, scrape_pdf
 import copy

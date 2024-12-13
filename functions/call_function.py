@@ -1,4 +1,4 @@
-from .web_api import web_search
+from .req_agent import web_search
 from .coder import Coder
 function_dict = {
     #"generate_image" : imagegenerator,
