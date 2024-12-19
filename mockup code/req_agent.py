@@ -240,10 +240,41 @@ def web_search(query, relevanceSort=False):
             break
         follow_up = input("You: ")
         chat_history.append({"role": "user", "content": follow_up})
-    return f"chat_histories/chat_{session_id}.json"
 
-# if __name__ == "__main__":
-#     print("Initializing response flow.")
+    file = f"chat_histories/chat_{session_id}.json"
+    with open(file, 'r') as f:
+        data = json.load(f)
+    last_entry = data[-1]
+    last_entry = last_entry.get("content", "")
+    last_entry = json.dumps(last_entry, indent=4)  # Pretty string format
 
-#     query = input("Enter your query: ")
-#     web_search(query)
+    prompt = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "system", "content": """You're a human and suppose you need to craft an intelligent prompt, that can be given to a GenAI tool like ChatGPT, using the input given by user to create codes and applications.
+                       IMPORTANT:
+                       1. Every detail must be clear and explicit.
+                       2. Also include instructions about the various separate modules, if needed, as per the ideal file folder structure of the application.
+                       3. Include all necessary information to make it deterministic and free from confusion.
+                       Example: Create a Python program with two modules: one for handling database operations and another for a REST API server. The database module should connect to SQLite and provide basic CRUD operations. The API module should use Flask to expose CRUD operations over HTTP."""},
+                       {"role": "user", "content": last_entry}]
+        )
+
+    prompt = prompt.choices[0].message.content
+    # Define the chat history directory
+    prompt_dir = "coding_prompts"
+    os.makedirs(prompt_dir, exist_ok=True)
+
+    # Define the file path using the session ID
+    file_path = os.path.join(prompt_dir, f"prompt_{session_id}.txt")
+
+    # Write the prompt content to the file
+    with open(file_path, "w") as file:
+        file.write(prompt)
+    
+    return f"chat_histories/chat_{session_id}.json", f"coding_prompts/prompt_{session_id}.txt"
+
+if __name__ == "__main__":
+    print("Initializing response flow.")
+
+    query = input("Enter your query: ")
+    web_search(query)
